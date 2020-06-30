@@ -14,7 +14,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "APPOINTMENTS")
-public class Appointment {
+public class Appointment implements Comparable<Appointment>{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -116,6 +116,10 @@ public class Appointment {
 	}
 	public void setAppointmentDateToString(String appointmentDateToString) {
 		this.appointmentDateToString = appointmentDateToString;
+	}
+	@Override
+	public int compareTo(Appointment o) {
+		return getAppointmentStartTime().compareTo(o.getAppointmentStartTime());
 	}
 	
 }

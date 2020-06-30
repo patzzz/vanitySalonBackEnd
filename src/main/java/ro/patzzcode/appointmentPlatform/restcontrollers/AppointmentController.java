@@ -1,14 +1,12 @@
 package ro.patzzcode.appointmentPlatform.restcontrollers;
 
 import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.joda.time.LocalTime;
-import org.joda.time.Period;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +25,6 @@ import ro.patzzcode.appointmentPlatform.repositories.AppointmentRepository;
 import ro.patzzcode.appointmentPlatform.repositories.UserRepository;
 import ro.patzzcode.appointmentPlatform.service.AppointmentService;
 import ro.patzzcode.appointmentPlatform.utils.Constants;
-import ro.patzzcode.appointmentPlatform.utils.DateCustom;
 import ro.patzzcode.appointmentPlatform.utils.FrontEndException;
 
 @RestController
@@ -384,49 +381,115 @@ public class AppointmentController {
 	public ResponseEntity<Object> checkAvailability(@RequestParam String desiredDate,
 			@RequestParam String desiredService) {
 		try {
+			// INVATA SA PUI CODURI DE PRODUSE DIN CONSTANTE
+
 //			String date = new SimpleDateFormat("yyyy-MM-dd").format(desiredDate);
+//			if (desiredService.equals("tuns_barbat")) {
+//				List<String> intervals = new ArrayList<String>();
+//				List<Appointment> appointments = appointmentRepository.findByAppointmentDateToStringAndValid(desiredDate, true);
+//				Appointment app = appointments.get(0);
+//				for(Appointment a : appointments) {
+//					if(a.equals(app)) {}
+//					else {
+//						long duration =  a.getAppointmentStartTime().getTime() - app.getAppointmentEndTime().getTime();
+//						System.out.println("Durata intre programari: " + duration);
+//						if(duration >= 1800000) {
+//							String startHour = app.getAppointmentInterval().substring(8,10);
+//							String startMinute = app.getAppointmentInterval().substring(11,13);
+//							String myTime = startHour + ":" + startMinute;
+//							System.out.println("START: " + myTime);
+//						}
+//					}
+//					app = a;
+//				}
+//			} else if (desiredService == "tuns_femeie") {
+//
+//			} else if (desiredService == "tuns_copil") {
+//
+//			} else if (desiredService == "spalat_barbat") {
+//
+//			} else if (desiredService == "spalat_femeie") {
+//
+//			} else if (desiredService == "vopsit_radacina") {
+//
+//			} else if (desiredService == "vopsit_uniform") {
+//
+//			} else if (desiredService == "balayage") {
+//
+//			} else if (desiredService == "corectare_culoare") {
+//
+//			} else if (desiredService == "schimbare_culoare") {
+//
+//			}
+			List<Appointment> free = new ArrayList<Appointment>();
 			if (desiredService.equals("tuns_barbat")) {
-				List<String> intervals = new ArrayList<String>();
-				List<Appointment> appointments = appointmentRepository.findByAppointmentDateToStringAndValid(desiredDate, true);
-				Appointment app = appointments.get(0);
-				for(Appointment a : appointments) {
-					if(a.equals(app)) {}
-					else {
-						long duration =  a.getAppointmentStartTime().getTime() - app.getAppointmentEndTime().getTime();
-						System.out.println("Durata intre programari: " + duration);
-						if(duration >= 1800000) {
-							String startHour = app.getAppointmentInterval().substring(8,10);
-							String startMinute = app.getAppointmentInterval().substring(11,13);
-							String myTime = startHour + ":" + startMinute;
-							System.out.println("START: " + myTime);
-						}
-					}
-					app = a;
+				Calendar cal = Calendar.getInstance();
+				cal.set(Calendar.HOUR_OF_DAY, 10);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date openTime = cal.getTime();
+
+				cal = Calendar.getInstance();
+				cal.set(Calendar.HOUR_OF_DAY, 18);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date closeTime = cal.getTime();
+				List<Appointment> appointments = appointmentRepository
+						.findByAppointmentDateToStringAndValid(desiredDate, true);
+				Collections.sort(appointments);
+				if (appointments.size() == 0) {
+					free.addAll(getFreeAppointment(openTime, closeTime, Constants.SERVICE_TUNS_BARBAT));
+				} else {
+					free.addAll(getFreeAppointment(openTime, appointments.get(0).getAppointmentStartTime(),
+							Constants.SERVICE_TUNS_BARBAT));
 				}
-			} else if (desiredService == "tuns_femeie") {
+				for (int i = 0; i < appointments.size(); i++) {
+					Appointment app = appointments.get(i);
+					Appointment nextApp = null;
+					if (i + 1 < appointments.size()) {
+						nextApp = appointments.get(i + 1);
+					}
+					if (nextApp != null) {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), nextApp.getAppointmentStartTime(),
+								Constants.SERVICE_TUNS_BARBAT));
+					} else {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), closeTime,
+								Constants.SERVICE_TUNS_BARBAT));
+					}
 
-			} else if (desiredService == "tuns_copil") {
-
-			} else if (desiredService == "spalat_barbat") {
-
-			} else if (desiredService == "spalat_femeie") {
-
-			} else if (desiredService == "vopsit_radacina") {
-
-			} else if (desiredService == "vopsit_uniform") {
-
-			} else if (desiredService == "balayage") {
-
-			} else if (desiredService == "corectare_culoare") {
-
-			} else if (desiredService == "schimbare_culoare") {
-
+				}
 			}
-
-			return new ResponseEntity<Object>(HttpStatus.NOT_ACCEPTABLE);
+			return new ResponseEntity<Object>(free, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
+	}
+
+	public List<Appointment> getFreeAppointment(Date start, Date end, int duration) {
+		List<Appointment> free = new ArrayList<Appointment>();
+		Calendar cal = Calendar.getInstance();
+		Date openTime = start;
+		Date closeTime = end;
+		long diff;
+		long diffMinutes;
+		diff = closeTime.getTime() - openTime.getTime();
+		diffMinutes = diff / (60 * 1000);
+		Appointment a = null;
+		for (int i = 0; i < diffMinutes / duration; i++) {
+			a = new Appointment();
+			cal = Calendar.getInstance();
+			cal.set(Calendar.HOUR_OF_DAY, 10 + i * duration);
+			a.setAppointmentStartTime(cal.getTime());
+			cal = Calendar.getInstance();
+			cal.set(Calendar.HOUR_OF_DAY, 10 + (i + 1) * duration);
+			a.setAppointmentEndTime(cal.getTime());
+			free.add(a);
+		}
+		return free;
 	}
 
 }
