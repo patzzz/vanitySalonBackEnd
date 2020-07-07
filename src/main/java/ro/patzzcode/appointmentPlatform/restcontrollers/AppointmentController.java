@@ -1,11 +1,13 @@
 package ro.patzzcode.appointmentPlatform.restcontrollers;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -378,7 +380,7 @@ public class AppointmentController {
 
 	@ApiOperation(value = "checkAvailability")
 	@RequestMapping(value = "/api/appointment/checkAvailability", method = RequestMethod.POST)
-	public ResponseEntity<Object> checkAvailability(@RequestParam String desiredDate,
+	public ResponseEntity<Object> checkAvailability(@RequestParam String desiredDateString,
 			@RequestParam String desiredService) {
 		try {
 			// INVATA SA PUI CODURI DE PRODUSE DIN CONSTANTE
@@ -421,9 +423,12 @@ public class AppointmentController {
 //			} else if (desiredService == "schimbare_culoare") {
 //
 //			}
+			DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+			Date desiredDate = format.parse(desiredDateString);
 			List<Appointment> free = new ArrayList<Appointment>();
 			if (desiredService.equals("tuns_barbat")) {
 				Calendar cal = Calendar.getInstance();
+				cal.setTime(desiredDate);
 				cal.set(Calendar.HOUR_OF_DAY, 10);
 				cal.set(Calendar.MINUTE, 0);
 				cal.set(Calendar.SECOND, 0);
@@ -431,7 +436,7 @@ public class AppointmentController {
 
 				Date openTime = cal.getTime();
 
-				cal = Calendar.getInstance();
+				cal.setTime(desiredDate);
 				cal.set(Calendar.HOUR_OF_DAY, 18);
 				cal.set(Calendar.MINUTE, 0);
 				cal.set(Calendar.SECOND, 0);
@@ -439,7 +444,7 @@ public class AppointmentController {
 
 				Date closeTime = cal.getTime();
 				List<Appointment> appointments = appointmentRepository
-						.findByAppointmentDateToStringAndValid(desiredDate, true);
+						.findByAppointmentDateToStringAndValid(desiredDateString, true);
 				Collections.sort(appointments);
 				if (appointments.size() == 0) {
 					free.addAll(getFreeAppointment(openTime, closeTime, Constants.SERVICE_TUNS_BARBAT));
@@ -472,6 +477,7 @@ public class AppointmentController {
 	public List<Appointment> getFreeAppointment(Date start, Date end, int duration) {
 		List<Appointment> free = new ArrayList<Appointment>();
 		Calendar cal = Calendar.getInstance();
+		cal.setTime(start);
 		Date openTime = start;
 		Date closeTime = end;
 		long diff;
@@ -481,11 +487,11 @@ public class AppointmentController {
 		Appointment a = null;
 		for (int i = 0; i < diffMinutes / duration; i++) {
 			a = new Appointment();
-			cal = Calendar.getInstance();
-			cal.set(Calendar.HOUR_OF_DAY, 10 + i * duration);
+			cal.setTime(start);
+			cal.set(Calendar.MINUTE, i * duration);
 			a.setAppointmentStartTime(cal.getTime());
-			cal = Calendar.getInstance();
-			cal.set(Calendar.HOUR_OF_DAY, 10 + (i + 1) * duration);
+			cal.setTime(start);
+			cal.set(Calendar.MINUTE, (i + 1) * duration);
 			a.setAppointmentEndTime(cal.getTime());
 			free.add(a);
 		}
