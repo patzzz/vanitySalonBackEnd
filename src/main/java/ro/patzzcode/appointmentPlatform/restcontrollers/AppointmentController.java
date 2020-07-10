@@ -383,46 +383,6 @@ public class AppointmentController {
 	public ResponseEntity<Object> checkAvailability(@RequestParam String desiredDateString,
 			@RequestParam String desiredService) {
 		try {
-			// INVATA SA PUI CODURI DE PRODUSE DIN CONSTANTE
-
-//			String date = new SimpleDateFormat("yyyy-MM-dd").format(desiredDate);
-//			if (desiredService.equals("tuns_barbat")) {
-//				List<String> intervals = new ArrayList<String>();
-//				List<Appointment> appointments = appointmentRepository.findByAppointmentDateToStringAndValid(desiredDate, true);
-//				Appointment app = appointments.get(0);
-//				for(Appointment a : appointments) {
-//					if(a.equals(app)) {}
-//					else {
-//						long duration =  a.getAppointmentStartTime().getTime() - app.getAppointmentEndTime().getTime();
-//						System.out.println("Durata intre programari: " + duration);
-//						if(duration >= 1800000) {
-//							String startHour = app.getAppointmentInterval().substring(8,10);
-//							String startMinute = app.getAppointmentInterval().substring(11,13);
-//							String myTime = startHour + ":" + startMinute;
-//							System.out.println("START: " + myTime);
-//						}
-//					}
-//					app = a;
-//				}
-//			} else if (desiredService == "tuns_femeie") {
-//
-//			} else if (desiredService == "tuns_copil") {
-//
-//			} else if (desiredService == "spalat_barbat") {
-//
-//			} else if (desiredService == "spalat_femeie") {
-//
-//			} else if (desiredService == "vopsit_radacina") {
-//
-//			} else if (desiredService == "vopsit_uniform") {
-//
-//			} else if (desiredService == "balayage") {
-//
-//			} else if (desiredService == "corectare_culoare") {
-//
-//			} else if (desiredService == "schimbare_culoare") {
-//
-//			}
 			DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 			Date desiredDate = format.parse(desiredDateString);
 			List<Appointment> free = new ArrayList<Appointment>();
@@ -464,6 +424,375 @@ public class AppointmentController {
 					} else {
 						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), closeTime,
 								Constants.SERVICE_TUNS_BARBAT));
+					}
+
+				}
+			}else if (desiredService.equals("tuns_femeie")) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 10);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date openTime = cal.getTime();
+
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 18);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date closeTime = cal.getTime();
+				List<Appointment> appointments = appointmentRepository
+						.findByAppointmentDateToStringAndValid(desiredDateString, true);
+				Collections.sort(appointments);
+				if (appointments.size() == 0) {
+					free.addAll(getFreeAppointment(openTime, closeTime, Constants.SERVICE_TUNS_FEMEIE));
+				} else {
+					free.addAll(getFreeAppointment(openTime, appointments.get(0).getAppointmentStartTime(),
+							Constants.SERVICE_TUNS_FEMEIE));
+				}
+				for (int i = 0; i < appointments.size(); i++) {
+					Appointment app = appointments.get(i);
+					Appointment nextApp = null;
+					if (i + 1 < appointments.size()) {
+						nextApp = appointments.get(i + 1);
+					}
+					if (nextApp != null) {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), nextApp.getAppointmentStartTime(),
+								Constants.SERVICE_TUNS_FEMEIE));
+					} else {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), closeTime,
+								Constants.SERVICE_TUNS_FEMEIE));
+					}
+
+				}
+			}else if (desiredService.equals("tuns_copil")) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 10);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date openTime = cal.getTime();
+
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 18);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date closeTime = cal.getTime();
+				List<Appointment> appointments = appointmentRepository
+						.findByAppointmentDateToStringAndValid(desiredDateString, true);
+				Collections.sort(appointments);
+				if (appointments.size() == 0) {
+					free.addAll(getFreeAppointment(openTime, closeTime, Constants.SERVICE_TUNS_COPII));
+				} else {
+					free.addAll(getFreeAppointment(openTime, appointments.get(0).getAppointmentStartTime(),
+							Constants.SERVICE_TUNS_COPII));
+				}
+				for (int i = 0; i < appointments.size(); i++) {
+					Appointment app = appointments.get(i);
+					Appointment nextApp = null;
+					if (i + 1 < appointments.size()) {
+						nextApp = appointments.get(i + 1);
+					}
+					if (nextApp != null) {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), nextApp.getAppointmentStartTime(),
+								Constants.SERVICE_TUNS_COPII));
+					} else {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), closeTime,
+								Constants.SERVICE_TUNS_COPII));
+					}
+
+				}
+			}else if (desiredService.equals("spalat_barbat")) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 10);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date openTime = cal.getTime();
+
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 18);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date closeTime = cal.getTime();
+				List<Appointment> appointments = appointmentRepository
+						.findByAppointmentDateToStringAndValid(desiredDateString, true);
+				Collections.sort(appointments);
+				if (appointments.size() == 0) {
+					free.addAll(getFreeAppointment(openTime, closeTime, Constants.SERVICE_SPALAT_BARBAT));
+				} else {
+					free.addAll(getFreeAppointment(openTime, appointments.get(0).getAppointmentStartTime(),
+							Constants.SERVICE_SPALAT_BARBAT));
+				}
+				for (int i = 0; i < appointments.size(); i++) {
+					Appointment app = appointments.get(i);
+					Appointment nextApp = null;
+					if (i + 1 < appointments.size()) {
+						nextApp = appointments.get(i + 1);
+					}
+					if (nextApp != null) {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), nextApp.getAppointmentStartTime(),
+								Constants.SERVICE_SPALAT_BARBAT));
+					} else {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), closeTime,
+								Constants.SERVICE_SPALAT_BARBAT));
+					}
+
+				}
+			}else if (desiredService.equals("spalat_femeie")) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 10);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date openTime = cal.getTime();
+
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 18);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date closeTime = cal.getTime();
+				List<Appointment> appointments = appointmentRepository
+						.findByAppointmentDateToStringAndValid(desiredDateString, true);
+				Collections.sort(appointments);
+				if (appointments.size() == 0) {
+					free.addAll(getFreeAppointment(openTime, closeTime, Constants.SERVICE_SPALAT_FEMEIE));
+				} else {
+					free.addAll(getFreeAppointment(openTime, appointments.get(0).getAppointmentStartTime(),
+							Constants.SERVICE_SPALAT_FEMEIE));
+				}
+				for (int i = 0; i < appointments.size(); i++) {
+					Appointment app = appointments.get(i);
+					Appointment nextApp = null;
+					if (i + 1 < appointments.size()) {
+						nextApp = appointments.get(i + 1);
+					}
+					if (nextApp != null) {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), nextApp.getAppointmentStartTime(),
+								Constants.SERVICE_SPALAT_FEMEIE));
+					} else {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), closeTime,
+								Constants.SERVICE_SPALAT_FEMEIE));
+					}
+
+				}
+			}else if (desiredService.equals("vopsit_radacina")) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 10);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date openTime = cal.getTime();
+
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 18);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date closeTime = cal.getTime();
+				List<Appointment> appointments = appointmentRepository
+						.findByAppointmentDateToStringAndValid(desiredDateString, true);
+				Collections.sort(appointments);
+				if (appointments.size() == 0) {
+					free.addAll(getFreeAppointment(openTime, closeTime, Constants.SERVICE_VOPSIT_RADACINA));
+				} else {
+					free.addAll(getFreeAppointment(openTime, appointments.get(0).getAppointmentStartTime(),
+							Constants.SERVICE_VOPSIT_RADACINA));
+				}
+				for (int i = 0; i < appointments.size(); i++) {
+					Appointment app = appointments.get(i);
+					Appointment nextApp = null;
+					if (i + 1 < appointments.size()) {
+						nextApp = appointments.get(i + 1);
+					}
+					if (nextApp != null) {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), nextApp.getAppointmentStartTime(),
+								Constants.SERVICE_VOPSIT_RADACINA));
+					} else {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), closeTime,
+								Constants.SERVICE_VOPSIT_RADACINA));
+					}
+
+				}
+			}else if (desiredService.equals("vopsit_uniform")) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 10);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date openTime = cal.getTime();
+
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 18);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date closeTime = cal.getTime();
+				List<Appointment> appointments = appointmentRepository
+						.findByAppointmentDateToStringAndValid(desiredDateString, true);
+				Collections.sort(appointments);
+				if (appointments.size() == 0) {
+					free.addAll(getFreeAppointment(openTime, closeTime, Constants.SERVICE_VOPSIT_UNIFORM));
+				} else {
+					free.addAll(getFreeAppointment(openTime, appointments.get(0).getAppointmentStartTime(),
+							Constants.SERVICE_VOPSIT_UNIFORM));
+				}
+				for (int i = 0; i < appointments.size(); i++) {
+					Appointment app = appointments.get(i);
+					Appointment nextApp = null;
+					if (i + 1 < appointments.size()) {
+						nextApp = appointments.get(i + 1);
+					}
+					if (nextApp != null) {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), nextApp.getAppointmentStartTime(),
+								Constants.SERVICE_VOPSIT_UNIFORM));
+					} else {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), closeTime,
+								Constants.SERVICE_VOPSIT_UNIFORM));
+					}
+
+				}
+			}else if (desiredService.equals("balayage")) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 10);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date openTime = cal.getTime();
+
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 18);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date closeTime = cal.getTime();
+				List<Appointment> appointments = appointmentRepository
+						.findByAppointmentDateToStringAndValid(desiredDateString, true);
+				Collections.sort(appointments);
+				if (appointments.size() == 0) {
+					free.addAll(getFreeAppointment(openTime, closeTime, Constants.SERVICE_BALAYAGE));
+				} else {
+					free.addAll(getFreeAppointment(openTime, appointments.get(0).getAppointmentStartTime(),
+							Constants.SERVICE_BALAYAGE));
+				}
+				for (int i = 0; i < appointments.size(); i++) {
+					Appointment app = appointments.get(i);
+					Appointment nextApp = null;
+					if (i + 1 < appointments.size()) {
+						nextApp = appointments.get(i + 1);
+					}
+					if (nextApp != null) {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), nextApp.getAppointmentStartTime(),
+								Constants.SERVICE_BALAYAGE));
+					} else {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), closeTime,
+								Constants.SERVICE_BALAYAGE));
+					}
+
+				}
+			}else if (desiredService.equals("corectare_culoare")) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 10);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date openTime = cal.getTime();
+
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 18);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date closeTime = cal.getTime();
+				List<Appointment> appointments = appointmentRepository
+						.findByAppointmentDateToStringAndValid(desiredDateString, true);
+				Collections.sort(appointments);
+				if (appointments.size() == 0) {
+					free.addAll(getFreeAppointment(openTime, closeTime, Constants.SERVICE_CORECTAT_DE_CULOARE));
+				} else {
+					free.addAll(getFreeAppointment(openTime, appointments.get(0).getAppointmentStartTime(),
+							Constants.SERVICE_CORECTAT_DE_CULOARE));
+				}
+				for (int i = 0; i < appointments.size(); i++) {
+					Appointment app = appointments.get(i);
+					Appointment nextApp = null;
+					if (i + 1 < appointments.size()) {
+						nextApp = appointments.get(i + 1);
+					}
+					if (nextApp != null) {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), nextApp.getAppointmentStartTime(),
+								Constants.SERVICE_CORECTAT_DE_CULOARE));
+					} else {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), closeTime,
+								Constants.SERVICE_CORECTAT_DE_CULOARE));
+					}
+
+				}
+			}else if (desiredService.equals("schimbare_culoare")) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 10);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date openTime = cal.getTime();
+
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 18);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date closeTime = cal.getTime();
+				List<Appointment> appointments = appointmentRepository
+						.findByAppointmentDateToStringAndValid(desiredDateString, true);
+				Collections.sort(appointments);
+				if (appointments.size() == 0) {
+					free.addAll(getFreeAppointment(openTime, closeTime, Constants.SERVICE_SCHIMBARE_DE_CULOARE));
+				} else {
+					free.addAll(getFreeAppointment(openTime, appointments.get(0).getAppointmentStartTime(),
+							Constants.SERVICE_SCHIMBARE_DE_CULOARE));
+				}
+				for (int i = 0; i < appointments.size(); i++) {
+					Appointment app = appointments.get(i);
+					Appointment nextApp = null;
+					if (i + 1 < appointments.size()) {
+						nextApp = appointments.get(i + 1);
+					}
+					if (nextApp != null) {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), nextApp.getAppointmentStartTime(),
+								Constants.SERVICE_SCHIMBARE_DE_CULOARE));
+					} else {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), closeTime,
+								Constants.SERVICE_SCHIMBARE_DE_CULOARE));
 					}
 
 				}

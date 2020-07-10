@@ -14,10 +14,10 @@ public class AppointmentPlatformApplication {
 		SpringApplication.run(AppointmentPlatformApplication.class, args);
 	}
 	
-//	@PostConstruct
-//    public void init(){
-//      // Setting Spring Boot SetTimeZone
-//      TimeZone.setDefault(TimeZone.getTimeZone(""));
-//    }
+	@PostConstruct
+    public void init(){
+      // Setting Spring Boot SetTimeZone
+      TimeZone.setDefault(TimeZone.getTimeZone(""));
+    }
 
 }
