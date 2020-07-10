@@ -816,11 +816,12 @@ public class AppointmentController {
 		Appointment a = null;
 		for (int i = 0; i < diffMinutes / duration; i++) {
 			a = new Appointment();
-			cal.setTime(start);
-			cal.set(Calendar.MINUTE, i * duration);
+			cal.setTime(openTime);
+			cal.add(Calendar.MINUTE, i * duration);
 			a.setAppointmentStartTime(cal.getTime());
-			cal.setTime(start);
-			cal.set(Calendar.MINUTE, (i + 1) * duration);
+			cal.setTime(openTime);
+			cal.add(Calendar.MINUTE, (i + 1) * duration);
+//			cal.set(Calendar.MINUTE, (i + 1) * duration);
 			a.setAppointmentEndTime(cal.getTime());
 			free.add(a);
 		}
