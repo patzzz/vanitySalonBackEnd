@@ -60,4 +60,14 @@ public class AppointmentService {
 		appointmentRepository.save(appointment);
 		return appointment;
 	}
+	
+	public String returnInterval(Appointment appointment) {
+		String interval = new String();
+		String startHour = appointment.getAppointmentStartTime().toString().substring(11,13);
+		String startMinute = appointment.getAppointmentStartTime().toString().substring(14,16);
+		String endHour = appointment.getAppointmentEndTime().toString().substring(11,13);
+		String endMinute = appointment.getAppointmentEndTime().toString().substring(14,16);
+		interval = startHour + ":" + startMinute + " - " + endHour + ":" + endMinute;
+		return interval;
+	}
 }

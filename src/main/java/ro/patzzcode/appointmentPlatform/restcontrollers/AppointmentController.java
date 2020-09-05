@@ -231,37 +231,92 @@ public class AppointmentController {
 		}
 	}
 
+//	@ApiOperation(value = "getAllAppointmentsOfUserWithStatus")
+//	@RequestMapping(value = "/api/appointment/getAllAppointmentsOfUserWithStatus", method = RequestMethod.GET)
+//	public ResponseEntity<Object> getAllAppointmentsOfUserWithStatus(@RequestParam int page, @RequestParam int size,
+//			@RequestParam long userID, @RequestParam int statusID) {
+//		try {
+//			User user = userRepository.findById(userID).orElse(null);
+//			if (user != null) {
+//				if (statusID >= 0 && statusID <= 4) {
+//					if (statusID == 0) {
+//						Page<Appointment> appointments = appointmentRepository
+//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+//										user, Constants.APPOINTMENT_STATUS_PENDING);
+//						return new ResponseEntity<Object>(appointments, HttpStatus.OK);
+//					} else if (statusID == 1) {
+//						Page<Appointment> appointments = appointmentRepository
+//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+//										user, Constants.APPOINTMENT_STATUS_CONFIRMED);
+//						return new ResponseEntity<Object>(appointments, HttpStatus.OK);
+//					} else if (statusID == 2) {
+//						Page<Appointment> appointments = appointmentRepository
+//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+//										user, Constants.APPOINTMENT_STATUS_COMPLETED);
+//						return new ResponseEntity<Object>(appointments, HttpStatus.OK);
+//					} else {
+//						Page<Appointment> appointments = appointmentRepository
+//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+//										user, Constants.APPOINTMENT_STATUS_CANCELED);
+//						return new ResponseEntity<Object>(appointments, HttpStatus.OK);
+//					}
+//				}
+//				return new ResponseEntity<Object>(HttpStatus.NOT_ACCEPTABLE);
+//
+//			} else {
+//				return new ResponseEntity<Object>(
+//						new FrontEndException(new Date(), Constants.ERROR_STATUS_USER_NOT_FOUND,
+//								Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND),
+//						HttpStatus.NOT_ACCEPTABLE);
+//			}
+//		} catch (Exception e) {
+//			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+//		}
+//	}
+
 	@ApiOperation(value = "getAllAppointmentsOfUserWithStatus")
 	@RequestMapping(value = "/api/appointment/getAllAppointmentsOfUserWithStatus", method = RequestMethod.GET)
-	public ResponseEntity<Object> getAllAppointmentsOfUserWithStatus(@RequestParam int page, @RequestParam int size,
-			@RequestParam long userID, @RequestParam int statusID) {
+	public ResponseEntity<Object> getAllAppointmentsOfUserWithStatus(@RequestParam long userID,
+			@RequestParam List<Integer> statusID) {
 		try {
 			User user = userRepository.findById(userID).orElse(null);
 			if (user != null) {
-				if (statusID >= 0 && statusID <= 4) {
-					if (statusID == 0) {
-						Page<Appointment> appointments = appointmentRepository
-								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
-										user, Constants.APPOINTMENT_STATUS_PENDING);
-						return new ResponseEntity<Object>(appointments, HttpStatus.OK);
-					} else if (statusID == 1) {
-						Page<Appointment> appointments = appointmentRepository
-								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
-										user, Constants.APPOINTMENT_STATUS_CONFIRMED);
-						return new ResponseEntity<Object>(appointments, HttpStatus.OK);
-					} else if (statusID == 2) {
-						Page<Appointment> appointments = appointmentRepository
-								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
-										user, Constants.APPOINTMENT_STATUS_COMPLETED);
-						return new ResponseEntity<Object>(appointments, HttpStatus.OK);
-					} else {
-						Page<Appointment> appointments = appointmentRepository
-								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
-										user, Constants.APPOINTMENT_STATUS_CANCELED);
-						return new ResponseEntity<Object>(appointments, HttpStatus.OK);
+				List<Appointment> appointmentsToSend = new ArrayList<Appointment>();
+				for (Integer i : statusID) {
+					if (i == 0) {
+						List<Appointment> appointments = appointmentRepository.findByClientAndStatusOrderByAppointmentDateToStringDesc(user, Constants.APPOINTMENT_STATUS_PENDING);
+						for(Appointment a: appointments) {
+							appointmentsToSend.add(a);
+						}
+//						Page<Appointment> appointments = appointmentRepository
+//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+					} else if (i == 1) {
+						List<Appointment> appointments = appointmentRepository.findByClientAndStatusOrderByAppointmentDateToStringDesc(user, Constants.APPOINTMENT_STATUS_CONFIRMED);
+						for(Appointment a: appointments) {
+							appointmentsToSend.add(a);
+						}
+//						Page<Appointment> appointments = appointmentRepository
+//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+//										user, Constants.APPOINTMENT_STATUS_CONFIRMED);
+					} else if (i == 2) {
+						List<Appointment> appointments = appointmentRepository.findByClientAndStatusOrderByAppointmentDateToStringDesc(user, Constants.APPOINTMENT_STATUS_COMPLETED);
+						for(Appointment a: appointments) {
+							appointmentsToSend.add(a);
+						}
+//						Page<Appointment> appointments = appointmentRepository
+//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+//										user, Constants.APPOINTMENT_STATUS_COMPLETED);
+					} else if (i == 3) {
+						List<Appointment> appointments = appointmentRepository.findByClientAndStatusOrderByAppointmentDateToStringDesc(user, Constants.APPOINTMENT_STATUS_CANCELED);
+						for(Appointment a: appointments) {
+							appointmentsToSend.add(a);
+						}
+//						Page<Appointment> appointments = appointmentRepository
+//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+//										user, Constants.APPOINTMENT_STATUS_CANCELED);
 					}
 				}
-				return new ResponseEntity<Object>(HttpStatus.NOT_ACCEPTABLE);
+				return new ResponseEntity<Object>(appointmentsToSend, HttpStatus.OK);
 
 			} else {
 				return new ResponseEntity<Object>(
@@ -427,7 +482,7 @@ public class AppointmentController {
 					}
 
 				}
-			}else if (desiredService.equals("tuns_femeie")) {
+			} else if (desiredService.equals("tuns_femeie")) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(desiredDate);
 				cal.set(Calendar.HOUR_OF_DAY, 10);
@@ -468,7 +523,7 @@ public class AppointmentController {
 					}
 
 				}
-			}else if (desiredService.equals("tuns_copil")) {
+			} else if (desiredService.equals("tuns_copil")) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(desiredDate);
 				cal.set(Calendar.HOUR_OF_DAY, 10);
@@ -509,7 +564,7 @@ public class AppointmentController {
 					}
 
 				}
-			}else if (desiredService.equals("spalat_barbat")) {
+			} else if (desiredService.equals("spalat_barbat")) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(desiredDate);
 				cal.set(Calendar.HOUR_OF_DAY, 10);
@@ -550,7 +605,7 @@ public class AppointmentController {
 					}
 
 				}
-			}else if (desiredService.equals("spalat_femeie")) {
+			} else if (desiredService.equals("spalat_femeie")) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(desiredDate);
 				cal.set(Calendar.HOUR_OF_DAY, 10);
@@ -591,7 +646,48 @@ public class AppointmentController {
 					}
 
 				}
-			}else if (desiredService.equals("vopsit_radacina")) {
+			} else if (desiredService.equals("coafat")) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 10);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date openTime = cal.getTime();
+
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 18);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date closeTime = cal.getTime();
+				List<Appointment> appointments = appointmentRepository
+						.findByAppointmentDateToStringAndValid(desiredDateString, true);
+				Collections.sort(appointments);
+				if (appointments.size() == 0) {
+					free.addAll(getFreeAppointment(openTime, closeTime, Constants.SERVICE_COAFAT));
+				} else {
+					free.addAll(getFreeAppointment(openTime, appointments.get(0).getAppointmentStartTime(),
+							Constants.SERVICE_COAFAT));
+				}
+				for (int i = 0; i < appointments.size(); i++) {
+					Appointment app = appointments.get(i);
+					Appointment nextApp = null;
+					if (i + 1 < appointments.size()) {
+						nextApp = appointments.get(i + 1);
+					}
+					if (nextApp != null) {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), nextApp.getAppointmentStartTime(),
+								Constants.SERVICE_COAFAT));
+					} else {
+						free.addAll(
+								getFreeAppointment(app.getAppointmentEndTime(), closeTime, Constants.SERVICE_COAFAT));
+					}
+
+				}
+			} else if (desiredService.equals("vopsit_radacina")) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(desiredDate);
 				cal.set(Calendar.HOUR_OF_DAY, 10);
@@ -632,7 +728,7 @@ public class AppointmentController {
 					}
 
 				}
-			}else if (desiredService.equals("vopsit_uniform")) {
+			} else if (desiredService.equals("vopsit_uniform")) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(desiredDate);
 				cal.set(Calendar.HOUR_OF_DAY, 10);
@@ -673,7 +769,7 @@ public class AppointmentController {
 					}
 
 				}
-			}else if (desiredService.equals("balayage")) {
+			} else if (desiredService.equals("balayage")) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(desiredDate);
 				cal.set(Calendar.HOUR_OF_DAY, 10);
@@ -709,12 +805,12 @@ public class AppointmentController {
 						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), nextApp.getAppointmentStartTime(),
 								Constants.SERVICE_BALAYAGE));
 					} else {
-						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), closeTime,
-								Constants.SERVICE_BALAYAGE));
+						free.addAll(
+								getFreeAppointment(app.getAppointmentEndTime(), closeTime, Constants.SERVICE_BALAYAGE));
 					}
 
 				}
-			}else if (desiredService.equals("corectare_culoare")) {
+			} else if (desiredService.equals("corectare_culoare")) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(desiredDate);
 				cal.set(Calendar.HOUR_OF_DAY, 10);
@@ -755,7 +851,7 @@ public class AppointmentController {
 					}
 
 				}
-			}else if (desiredService.equals("schimbare_culoare")) {
+			} else if (desiredService.equals("schimbare_culoare")) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(desiredDate);
 				cal.set(Calendar.HOUR_OF_DAY, 10);
@@ -797,7 +893,11 @@ public class AppointmentController {
 
 				}
 			}
-			return new ResponseEntity<Object>(free, HttpStatus.OK);
+			List<String> intervals = new ArrayList<String>();
+			for (Appointment a : free) {
+				intervals.add(appointmentService.returnInterval(a));
+			}
+			return new ResponseEntity<Object>(intervals, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}

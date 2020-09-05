@@ -19,4 +19,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>{
 	Page<Appointment> findByAppointmentDateAndStatusOrderByAppointmentDateToStringDesc(Pageable pageable, Date date, String status);
 	Page<Appointment> findByAppointmentDateToStringAndStatusOrderByAppointmentDateToStringDesc(Pageable pageable, String appointmentDateToString, String status);
 	List<Appointment> findByAppointmentDateToStringAndValid(String appointmentDateToString, boolean valid);
+	
+	List<Appointment> findByClientAndStatusOrderByAppointmentDateToStringDesc(User client, String status);
+	
 }

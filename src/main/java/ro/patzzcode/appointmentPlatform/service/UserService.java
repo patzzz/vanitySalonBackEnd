@@ -26,6 +26,7 @@ public class UserService {
 		user.setLastUpdate(new Date());
 		user.setPassword(PasswordUtils.generateSecurePassword(user.getPassword(), safeSalt));
 		user.setValid(true);
+		user.setUsername(user.getMail());
 		userRepository.save(user);
 		return user;
 	}
