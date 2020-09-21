@@ -284,31 +284,39 @@ public class AppointmentController {
 				List<Appointment> appointmentsToSend = new ArrayList<Appointment>();
 				for (Integer i : statusID) {
 					if (i == 0) {
-						List<Appointment> appointments = appointmentRepository.findByClientAndStatusOrderByAppointmentDateToStringDesc(user, Constants.APPOINTMENT_STATUS_PENDING);
-						for(Appointment a: appointments) {
+						List<Appointment> appointments = appointmentRepository
+								.findByClientAndStatusOrderByAppointmentDateToStringDesc(user,
+										Constants.APPOINTMENT_STATUS_PENDING);
+						for (Appointment a : appointments) {
 							appointmentsToSend.add(a);
 						}
 //						Page<Appointment> appointments = appointmentRepository
 //								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
 					} else if (i == 1) {
-						List<Appointment> appointments = appointmentRepository.findByClientAndStatusOrderByAppointmentDateToStringDesc(user, Constants.APPOINTMENT_STATUS_CONFIRMED);
-						for(Appointment a: appointments) {
+						List<Appointment> appointments = appointmentRepository
+								.findByClientAndStatusOrderByAppointmentDateToStringDesc(user,
+										Constants.APPOINTMENT_STATUS_CONFIRMED);
+						for (Appointment a : appointments) {
 							appointmentsToSend.add(a);
 						}
 //						Page<Appointment> appointments = appointmentRepository
 //								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
 //										user, Constants.APPOINTMENT_STATUS_CONFIRMED);
 					} else if (i == 2) {
-						List<Appointment> appointments = appointmentRepository.findByClientAndStatusOrderByAppointmentDateToStringDesc(user, Constants.APPOINTMENT_STATUS_COMPLETED);
-						for(Appointment a: appointments) {
+						List<Appointment> appointments = appointmentRepository
+								.findByClientAndStatusOrderByAppointmentDateToStringDesc(user,
+										Constants.APPOINTMENT_STATUS_COMPLETED);
+						for (Appointment a : appointments) {
 							appointmentsToSend.add(a);
 						}
 //						Page<Appointment> appointments = appointmentRepository
 //								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
 //										user, Constants.APPOINTMENT_STATUS_COMPLETED);
 					} else if (i == 3) {
-						List<Appointment> appointments = appointmentRepository.findByClientAndStatusOrderByAppointmentDateToStringDesc(user, Constants.APPOINTMENT_STATUS_CANCELED);
-						for(Appointment a: appointments) {
+						List<Appointment> appointments = appointmentRepository
+								.findByClientAndStatusOrderByAppointmentDateToStringDesc(user,
+										Constants.APPOINTMENT_STATUS_CANCELED);
+						for (Appointment a : appointments) {
 							appointmentsToSend.add(a);
 						}
 //						Page<Appointment> appointments = appointmentRepository
@@ -926,6 +934,47 @@ public class AppointmentController {
 			free.add(a);
 		}
 		return free;
+	}
+
+	@ApiOperation(value = "invalidateDay")
+	@RequestMapping(value = "/api/appointment/invalidateDay", method = RequestMethod.POST)
+	public ResponseEntity<Object> invalidateDay(@RequestBody Appointment appointment) {
+		try {
+
+			appointment.setClient(null);
+			appointment.setId(null);
+			Date start = appointment.getAppointmentDate();
+
+			start.setHours(10);
+			appointment.setAppointmentStartTime(start);
+			appointment.setCreationDate(new Date());
+			appointment.setLastUpdate(new Date());
+			appointment.setAppointmentInterval("10:00 - 18:00");
+			appointmentRepository.save(appointment);
+
+			Appointment a = appointmentRepository.findById(appointment.getId()).orElse(null);
+			Date end = a.getAppointmentDate();
+			end.setHours(18);
+			a.setAppointmentEndTime(end);
+			appointmentRepository.save(a);
+
+			return new ResponseEntity<Object>(appointment, HttpStatus.CREATED);
+
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@ApiOperation(value = "getDaysOff")
+	@RequestMapping(value = "/api/appointment/getDaysOff", method = RequestMethod.GET)
+	public ResponseEntity<Object> getDaysOff(@RequestParam int page, @RequestParam int size) {
+		try {
+			Page<Appointment> days = appointmentRepository.findByServiceAndValidOrderByAppointmentDateToStringDesc(
+					PageRequest.of(page, size), "DAY OFF", true);
+			return new ResponseEntity<Object>(days, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
 	}
 
 }

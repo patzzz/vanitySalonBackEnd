@@ -34,7 +34,7 @@ public class MailService {
 			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 
 			mimeMessageHelper.setSubject(mail.getMailSubject());
-			mimeMessageHelper.setFrom(new InternetAddress(mail.getMailFrom(), "VANITY APP REGISTRATION"));
+			mimeMessageHelper.setFrom(new InternetAddress(mail.getMailFrom(), "VANITY SALON - confirmare e-mail"));
 			mimeMessageHelper.setTo(mail.getMailTo());
 			mimeMessageHelper.setText(mail.getMailContent());
 			

@@ -2,6 +2,7 @@ package ro.patzzcode.appointmentPlatform.restcontrollers;
 
 import java.util.Date;
 import java.util.List;
+import java.util.logging.ErrorManager;
 
 import org.joda.time.DateTime;
 import org.joda.time.Period;
@@ -18,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import io.swagger.annotations.ApiOperation;
+import ro.patzzcode.appointmentPlatform.bo.ErrorMessage;
 import ro.patzzcode.appointmentPlatform.bo.User;
 import ro.patzzcode.appointmentPlatform.repositories.UserRepository;
 import ro.patzzcode.appointmentPlatform.security.bo.LoginUser;
@@ -39,7 +40,7 @@ public class UserController {
 	private UserService userService;
 	@Autowired
 	private MailService mailService;
-	
+
 	@Value("${token.pass.salt}")
 	private String safeSalt;
 
@@ -55,7 +56,8 @@ public class UserController {
 				} else {
 					return new ResponseEntity<Object>(
 							new FrontEndException(new Date(), Constants.ERROR_STATUS_USED_CREDENTIALS,
-									Constants.ERROR_ERROR_USED_CREDENTIALS, Constants.ERROR_MESSAGE_USED_CREDENTIALS), HttpStatus.NOT_ACCEPTABLE);
+									Constants.ERROR_ERROR_USED_CREDENTIALS, Constants.ERROR_MESSAGE_USED_CREDENTIALS),
+							HttpStatus.NOT_ACCEPTABLE);
 				}
 			}
 			return new ResponseEntity<Object>(HttpStatus.NOT_ACCEPTABLE);
@@ -63,29 +65,38 @@ public class UserController {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@ApiOperation(value = "login")
 	@RequestMapping(value = "/api/user/login", method = RequestMethod.POST)
 	public ResponseEntity<Object> login(@RequestBody LoginUser user) {
 		try {
 			if (user != null && user.getUsername() != null && user.getPassword() != null) {
 				User loginUser = userRepository.findByUsername(user.getUsername()).orElse(null);
-				if(loginUser == null) {
+				if (loginUser == null) {
 					return new ResponseEntity<Object>(
 							new FrontEndException(new Date(), Constants.ERROR_STATUS_USER_NOT_FOUND,
-									Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND), HttpStatus.NOT_ACCEPTABLE);
+									Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND),
+							HttpStatus.NOT_ACCEPTABLE);
 				}
 				if (!PasswordUtils.verifyUserPassword(user.getPassword(), loginUser.getPassword(), safeSalt)) {
 					return new ResponseEntity<Object>(
 							new FrontEndException(new Date(), Constants.ERROR_STATUS_WRONG_CREDENTIALS,
-									Constants.ERROR_ERROR_WRONG_CREDENTIALS, Constants.ERROR_MESSAGE_WRONG_CREDENTIALS), HttpStatus.NOT_ACCEPTABLE);
-				}else {
+									Constants.ERROR_ERROR_WRONG_CREDENTIALS, Constants.ERROR_MESSAGE_WRONG_CREDENTIALS),
+							HttpStatus.NOT_ACCEPTABLE);
+				} else if (loginUser.getStatus() == 0) {
+					ErrorMessage e = new ErrorMessage();
+					e.setText("USER WAS NOT VERIFIED");
+					return new ResponseEntity<Object>(e, HttpStatus.NOT_ACCEPTABLE);
+				} else if (loginUser.getStatus() == 1) {
 					return new ResponseEntity<Object>(loginUser, HttpStatus.OK);
+				} else {
+					return new ResponseEntity<Object>(HttpStatus.NOT_ACCEPTABLE);
 				}
 			} else {
 				return new ResponseEntity<Object>(
 						new FrontEndException(new Date(), Constants.ERROR_STATUS_USER_NOT_FOUND,
-								Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND), HttpStatus.NOT_ACCEPTABLE);
+								Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND),
+						HttpStatus.NOT_ACCEPTABLE);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -102,13 +113,36 @@ public class UserController {
 			} else {
 				return new ResponseEntity<Object>(
 						new FrontEndException(new Date(), Constants.ERROR_STATUS_USER_NOT_FOUND,
-								Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND), HttpStatus.NOT_ACCEPTABLE);
+								Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND),
+						HttpStatus.NOT_ACCEPTABLE);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 	
+
+	@ApiOperation(value = "changePassword")
+	@RequestMapping(value = "/api/user/changePassword", method = RequestMethod.POST)
+	public ResponseEntity<Object> changePassword(@RequestParam String password, @RequestParam String username) {
+		try {
+			User user = userRepository.findByUsername(username).orElse(null);
+			if (user != null) {
+				user.setPassword(PasswordUtils.generateSecurePassword(password, safeSalt));
+				user.setLastUpdate(new Date());
+				userRepository.save(user);
+				return new ResponseEntity<Object>(user, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<Object>(
+						new FrontEndException(new Date(), Constants.ERROR_STATUS_USER_NOT_FOUND,
+								Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND),
+						HttpStatus.NOT_ACCEPTABLE);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
 	@ApiOperation(value = "getAllUsers")
 	@RequestMapping(value = "/api/user/getAllUsers", method = RequestMethod.POST)
 	public ResponseEntity<Object> getAllUsers() {
@@ -119,7 +153,7 @@ public class UserController {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@ApiOperation(value = "getAllBlacklistUsers")
 	@RequestMapping(value = "/api/user/getAllBlacklistUsers", method = RequestMethod.POST)
 	public ResponseEntity<Object> getAllBlacklistUsers() {
@@ -130,7 +164,7 @@ public class UserController {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	/**
 	 * This method updates user for whom User u was provided
 	 * 
@@ -152,16 +186,17 @@ public class UserController {
 				u.setLastUpdate(new Date());
 				u = userRepository.save(u);
 				return new ResponseEntity<Object>(u, HttpStatus.ACCEPTED);
-			}else {
+			} else {
 				return new ResponseEntity<Object>(
 						new FrontEndException(new Date(), Constants.ERROR_STATUS_USER_NOT_FOUND,
-								Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND), HttpStatus.NOT_ACCEPTABLE);
+								Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND),
+						HttpStatus.NOT_ACCEPTABLE);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	/**
 	 * This method generates the OTP for register of the user for whom usrID and
 	 * emailOrPhone was provided
@@ -187,21 +222,30 @@ public class UserController {
 				u.setRegisterCode(Constants.OTP());
 				if (emailOrPhone.contains("@")) {
 					Mail mail = new Mail();
-					mail.setMailFrom("beautysalonappointments@gmail.com");
+					mail.setMailFrom("confirmation@vanitysalon.ro");
 					mail.setMailTo(emailOrPhone);
-					mail.setMailSubject("VANITY - OTP");
-					mail.setMailContent("Your OTP is : " + u.getRegisterCode());
+					mail.setMailSubject("VANITY SALON - confirmare e-mail");
+					mail.setMailContent("Buna ziua " + u.getLastName() + ",\n\n"
+							+ "Pentru a finaliza inregistrarea unui nou cont, trebuie sa introduceti in aplicatie urmatorul cod de verificare: "
+							+ u.getRegisterCode()
+							+ "\n\nCodul de mai sus se va utiliza pentru verificarea adresei de e-mail "
+							+ u.getUsername() + " si este valabil pana la inregistrarea contului.\n\n"
+							+ "Numarul dvs. de telefon, la care veti putea fi contactat este: " + u.getPhoneNumber()
+							+ "\n\nVa multumim ca doriti sa deveniti clientul nostru!"
+							+ "\n\nDaca nu sunteti persoana care a generat acest cod, va rugam sa ignorati mesajul."
+							+ "\n\n Cu respect echipa Vanity Beauty Salon.");
 					mailService.sendEmail(mail);
 				} else {
 					// here must implement SEND SMS
 				}
 				u.setStatus(Constants.USER_STATUS_WAIT_OTP);
 				u = userRepository.save(u);
-				return new ResponseEntity<Object>("OTP was generated",HttpStatus.CREATED);
-			}else {
+				return new ResponseEntity<Object>("OTP was generated", HttpStatus.CREATED);
+			} else {
 				return new ResponseEntity<Object>(
 						new FrontEndException(new Date(), Constants.ERROR_STATUS_USER_NOT_FOUND,
-								Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND), HttpStatus.NOT_ACCEPTABLE);
+								Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND),
+						HttpStatus.NOT_ACCEPTABLE);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -257,15 +301,15 @@ public class UserController {
 						Constants.ERROR_ERROR_OTP_NOT_ACCEPTABLE, Constants.ERROR_MESSAGE_OTP_NOT_ACCEPTABLE),
 				HttpStatus.BAD_REQUEST);
 	}
-	
+
 	@ApiOperation(value = "increaseBlacklistCount")
 	@RequestMapping(value = "/api/user/increaseBlacklistCount", method = RequestMethod.POST)
 	public ResponseEntity<Object> increaseBlacklistCount(@RequestParam Long userID) {
 		try {
 			User user = userRepository.findById(userID).orElse(null);
 			if (user != null) {
-				user.setBlacklistCount(user.getBlacklistCount()+1);
-				if(user.getBlacklistCount() == 3) {
+				user.setBlacklistCount(user.getBlacklistCount() + 1);
+				if (user.getBlacklistCount() == 3) {
 					user.setOnBlacklist(true);
 				}
 				user.setLastUpdate(new Date());
@@ -274,13 +318,14 @@ public class UserController {
 			} else {
 				return new ResponseEntity<Object>(
 						new FrontEndException(new Date(), Constants.ERROR_STATUS_USER_NOT_FOUND,
-								Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND), HttpStatus.NOT_ACCEPTABLE);
+								Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND),
+						HttpStatus.NOT_ACCEPTABLE);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@ApiOperation(value = "addToBlacklist")
 	@RequestMapping(value = "/api/user/addToBlacklist", method = RequestMethod.POST)
 	public ResponseEntity<Object> addToBlacklist(@RequestParam Long userID) {
@@ -295,13 +340,14 @@ public class UserController {
 			} else {
 				return new ResponseEntity<Object>(
 						new FrontEndException(new Date(), Constants.ERROR_STATUS_USER_NOT_FOUND,
-								Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND), HttpStatus.NOT_ACCEPTABLE);
+								Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND),
+						HttpStatus.NOT_ACCEPTABLE);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@ApiOperation(value = "searchUser")
 	@RequestMapping(value = "/api/user/searchUser", method = RequestMethod.POST)
 	public ResponseEntity<Object> searchUser(@RequestParam String name) {
@@ -309,11 +355,12 @@ public class UserController {
 			List<User> users = userRepository.findByFirstNameContaining(name);
 			if (users.isEmpty()) {
 				List<User> users2 = userRepository.findByLastNameContaining(name);
-				if(users2.isEmpty()) {
+				if (users2.isEmpty()) {
 					return new ResponseEntity<Object>(
 							new FrontEndException(new Date(), Constants.ERROR_STATUS_USER_NOT_FOUND,
-									Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND), HttpStatus.NOT_ACCEPTABLE);
-				}else {
+									Constants.ERROR_ERROR_USER_NOT_FOUND, Constants.ERROR_MESSAGE_USER_NOT_FOUND),
+							HttpStatus.NOT_ACCEPTABLE);
+				} else {
 					return new ResponseEntity<Object>(users, HttpStatus.OK);
 				}
 			} else {
@@ -321,6 +368,36 @@ public class UserController {
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@ApiOperation(value = "forgotPassword")
+	@RequestMapping(value = "/api/user/forgotPassword", method = RequestMethod.POST)
+	public ResponseEntity<Object> forgotPassword(@RequestParam String userMail) {
+		try {
+			User u = userRepository.findByMail(userMail).orElse(null);
+			if (u != null) {
+				String pass = PasswordUtils.resetPass(10);
+				u.setPassword(PasswordUtils.generateSecurePassword(pass, safeSalt));				
+				Mail mail = new Mail();
+				mail.setMailFrom("office@vanitysalon.ro");
+				mail.setMailTo(u.getMail());
+				mail.setMailSubject("VANITY SALON - resetare parola");
+				mail.setMailContent("Buna ziua " + u.getLastName() + ",\n\n"
+						+ "Noua ta parola pentru cont este: " + pass 
+						+ "\n\nCu ajutorul acestei parole va veti putea loga in aplicatie. "
+						+ "\n\nDupa prima logare este recomandat sa va schimbati parola."
+						+ "\n\nDaca nu sunteti persoana care a generat acest cod, va rugam sa ignorati mesajul."
+						+ "\n\n Cu respect echipa Vanity Beauty Salon.");
+				mailService.sendEmail(mail);				
+				u.setLastUpdate(new Date());
+				userRepository.save(u);
+				return new ResponseEntity<Object>("Your new password was sent on your mail", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<Object>("Mail address was not found, please try again", HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e, HttpStatus.OK);
 		}
 	}
 }
