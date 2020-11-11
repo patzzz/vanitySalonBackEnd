@@ -25,6 +25,8 @@ public class AppointmentService {
 		appointment.setStatus(Constants.APPOINTMENT_STATUS_PENDING);
 		appointment.setCreationDate(new Date());
 		appointment.setLastUpdate(new Date());
+		appointment.setAppointmentInterval(appointment.getAppointmentInterval());
+		appointment.setAppointmentDate(appointment.getAppointmentDate());
 		String startHour = appointment.getAppointmentInterval().substring(0,2);
 		String startMinute = appointment.getAppointmentInterval().substring(3,5);
 		String endHour = appointment.getAppointmentInterval().substring(8,10);
@@ -36,18 +38,18 @@ public class AppointmentService {
 		String workaround = new SimpleDateFormat("yyyy-MM-dd").format(appointment.getAppointmentDate());
 		appointment.setAppointmentDateToString(workaround);
 		appointment.setValid(true);
+		appointment = appointmentRepository.save(appointment);
 		
 		Appointment breakAppointment = new Appointment();
 		breakAppointment.setStatus(Constants.APPOINTMENT_STATUS_CONFIRMED);
 		breakAppointment.setCreationDate(new Date());
 		breakAppointment.setLastUpdate(new Date());
-		Date breakStartTime = DateUtils.addMinutes(startDateTime, 15);
 		Date breakEndTime = DateUtils.addMinutes(endDateTime, 15);
-		breakAppointment.setAppointmentStartTime(startDateTime);
-		breakAppointment.setAppointmentEndTime(endDateTime);
-		workaround = new SimpleDateFormat("yyyy-MM-dd").format(breakAppointment.getAppointmentDate());
+		breakAppointment.setAppointmentStartTime(endDateTime);
+		breakAppointment.setAppointmentEndTime(breakEndTime);
 		breakAppointment.setAppointmentDateToString(workaround);
 		breakAppointment.setValid(true);
+		breakAppointment.setService("DAY OFF");
 		appointmentRepository.save(breakAppointment);
 //		System.out.println("APPOINTMENT DATE: "+appointment.getAppointmentDate());
 //		System.out.println(startHour + ":" + startMinute +" - " + endHour +":"+endMinute);
