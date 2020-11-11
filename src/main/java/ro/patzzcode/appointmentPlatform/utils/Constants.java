@@ -37,8 +37,8 @@ public class Constants {
 	public static final int SERVICE_COAFAT = 90;
 	public static final int SERVICE_VOPSIT_RADACINA = 150;
 	public static final int SERVICE_VOPSIT_UNIFORM = 180;
-	public static final int SERVICE_BALAYAGE = 240;
-	public static final int SERVICE_CORECTAT_DE_CULOARE = 240;
+	public static final int SERVICE_BALAYAGE = 270;
+	public static final int SERVICE_CORECTAT_DE_CULOARE = 270;
 	public static final int SERVICE_SCHIMBARE_DE_CULOARE = 360;
 	
 	
