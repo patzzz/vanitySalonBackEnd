@@ -3,6 +3,7 @@ package ro.patzzcode.appointmentPlatform.service;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,19 @@ public class AppointmentService {
 		String workaround = new SimpleDateFormat("yyyy-MM-dd").format(appointment.getAppointmentDate());
 		appointment.setAppointmentDateToString(workaround);
 		appointment.setValid(true);
-		appointmentRepository.save(appointment);
+		
+		Appointment breakAppointment = new Appointment();
+		breakAppointment.setStatus(Constants.APPOINTMENT_STATUS_CONFIRMED);
+		breakAppointment.setCreationDate(new Date());
+		breakAppointment.setLastUpdate(new Date());
+		Date breakStartTime = DateUtils.addMinutes(startDateTime, 15);
+		Date breakEndTime = DateUtils.addMinutes(endDateTime, 15);
+		breakAppointment.setAppointmentStartTime(startDateTime);
+		breakAppointment.setAppointmentEndTime(endDateTime);
+		workaround = new SimpleDateFormat("yyyy-MM-dd").format(breakAppointment.getAppointmentDate());
+		breakAppointment.setAppointmentDateToString(workaround);
+		breakAppointment.setValid(true);
+		appointmentRepository.save(breakAppointment);
 //		System.out.println("APPOINTMENT DATE: "+appointment.getAppointmentDate());
 //		System.out.println(startHour + ":" + startMinute +" - " + endHour +":"+endMinute);
 //		System.out.println("START TIME: " + startDateTime.getHours() + ":" + startDateTime.getMinutes());
