@@ -33,6 +33,7 @@ public class Appointment implements Comparable<Appointment>{
 	private String service;
 	private String clientMessage;
 	private String appointmentDateToString;
+	private String fromAdminClientName;
 	public Long getId() {
 		return id;
 	}
@@ -120,6 +121,12 @@ public class Appointment implements Comparable<Appointment>{
 	@Override
 	public int compareTo(Appointment o) {
 		return getAppointmentStartTime().compareTo(o.getAppointmentStartTime());
+	}
+	public String getFromAdminClientName() {
+		return fromAdminClientName;
+	}
+	public void setFromAdminClientName(String fromAdminClientName) {
+		this.fromAdminClientName = fromAdminClientName;
 	}
 	
 }

@@ -41,12 +41,16 @@ public class AppointmentController {
 
 	@ApiOperation(value = "registerAppointment")
 	@RequestMapping(value = "/api/appointment/registerAppointment", method = RequestMethod.POST)
-	public ResponseEntity<Object> registerAppointment(@RequestBody Appointment appointment, @RequestParam long userID) {
+	public ResponseEntity<Object> registerAppointment(@RequestBody Appointment appointment, @RequestParam long userID, @RequestParam String clientName) {
 		try {
 			User user = userRepository.findById(userID).orElse(null);
 			if (user != null) {
 				if (appointment != null) {
 					appointment = appointmentService.createAppointment(appointment, user);
+					if(user.isAdmin()) {
+						appointment.setFromAdminClientName(clientName);
+						appointmentRepository.save(appointment);
+					}
 					return new ResponseEntity<Object>(appointment, HttpStatus.CREATED);
 				}
 				return new ResponseEntity<Object>(HttpStatus.NOT_ACCEPTABLE);
