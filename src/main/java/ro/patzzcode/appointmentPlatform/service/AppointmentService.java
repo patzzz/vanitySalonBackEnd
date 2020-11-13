@@ -40,17 +40,19 @@ public class AppointmentService {
 		appointment.setValid(true);
 		appointment = appointmentRepository.save(appointment);
 		
-		Appointment breakAppointment = new Appointment();
-		breakAppointment.setStatus(Constants.APPOINTMENT_STATUS_CONFIRMED);
-		breakAppointment.setCreationDate(new Date());
-		breakAppointment.setLastUpdate(new Date());
-		Date breakEndTime = DateUtils.addMinutes(endDateTime, 15);
-		breakAppointment.setAppointmentStartTime(endDateTime);
-		breakAppointment.setAppointmentEndTime(breakEndTime);
-		breakAppointment.setAppointmentDateToString(workaround);
-		breakAppointment.setValid(true);
-		breakAppointment.setService("DAY OFF");
-		appointmentRepository.save(breakAppointment);
+		if(!appointment.getService().equals("DAY OFF")) {
+			Appointment breakAppointment = new Appointment();
+			breakAppointment.setStatus(Constants.APPOINTMENT_STATUS_CONFIRMED);
+			breakAppointment.setCreationDate(new Date());
+			breakAppointment.setLastUpdate(new Date());
+			Date breakEndTime = DateUtils.addMinutes(endDateTime, 15);
+			breakAppointment.setAppointmentStartTime(endDateTime);
+			breakAppointment.setAppointmentEndTime(breakEndTime);
+			breakAppointment.setAppointmentDateToString(workaround);
+			breakAppointment.setValid(true);
+			breakAppointment.setService("DAY OFF");
+			appointmentRepository.save(breakAppointment);
+		}
 //		System.out.println("APPOINTMENT DATE: "+appointment.getAppointmentDate());
 //		System.out.println(startHour + ":" + startMinute +" - " + endHour +":"+endMinute);
 //		System.out.println("START TIME: " + startDateTime.getHours() + ":" + startDateTime.getMinutes());
