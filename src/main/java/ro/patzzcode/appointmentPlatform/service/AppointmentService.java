@@ -50,7 +50,7 @@ public class AppointmentService {
 			breakAppointment.setAppointmentEndTime(breakEndTime);
 			breakAppointment.setAppointmentDateToString(workaround);
 			breakAppointment.setValid(true);
-			breakAppointment.setService("DAY OFF");
+			breakAppointment.setService("BREAK BETWEEN APPOINTMENTS");
 			appointmentRepository.save(breakAppointment);
 		}
 //		System.out.println("APPOINTMENT DATE: "+appointment.getAppointmentDate());

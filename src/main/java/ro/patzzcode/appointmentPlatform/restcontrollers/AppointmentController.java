@@ -999,5 +999,17 @@ public class AppointmentController {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@ApiOperation(value = "getAllBreaks")
+	@RequestMapping(value = "/api/appointment/getAllBreaks", method = RequestMethod.GET)
+	public ResponseEntity<Object> getAllBreaks(@RequestParam int page, @RequestParam int size) {
+		try {
+			Page<Appointment> days = appointmentRepository.findByServiceAndValidOrderByAppointmentDateToStringDesc(
+					PageRequest.of(page, size), "BREAK BETWEEN APPOINTMENTS", true);
+			return new ResponseEntity<Object>(days, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
 
 }
