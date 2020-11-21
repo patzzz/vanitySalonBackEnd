@@ -923,6 +923,47 @@ public class AppointmentController {
 					}
 
 				}
+			} else if (desiredService.equals("feonat")) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 10);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date openTime = cal.getTime();
+
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 18);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date closeTime = cal.getTime();
+				List<Appointment> appointments = appointmentRepository
+						.findByAppointmentDateToStringAndValid(desiredDateString, true);
+				Collections.sort(appointments);
+				if (appointments.size() == 0) {
+					free.addAll(getFreeAppointment(openTime, closeTime, Constants.SERVICE_FEONAT));
+				} else {
+					free.addAll(getFreeAppointment(openTime, appointments.get(0).getAppointmentStartTime(),
+							Constants.SERVICE_FEONAT));
+				}
+				for (int i = 0; i < appointments.size(); i++) {
+					Appointment app = appointments.get(i);
+					Appointment nextApp = null;
+					if (i + 1 < appointments.size()) {
+						nextApp = appointments.get(i + 1);
+					}
+					if (nextApp != null) {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), nextApp.getAppointmentStartTime(),
+								Constants.SERVICE_FEONAT));
+					} else {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), closeTime,
+								Constants.SERVICE_FEONAT));
+					}
+
+				}
 			}
 			List<String> intervals = new ArrayList<String>();
 			for (Appointment a : free) {

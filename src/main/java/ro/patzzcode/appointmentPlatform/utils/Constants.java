@@ -40,7 +40,7 @@ public class Constants {
 	public static final int SERVICE_BALAYAGE = 270;
 	public static final int SERVICE_CORECTAT_DE_CULOARE = 270;
 	public static final int SERVICE_SCHIMBARE_DE_CULOARE = 360;
-	
+	public static final int SERVICE_FEONAT = 60;
 	
 	public static final String ERROR_STATUS_UNAUTHORIZED = "1";
 	public static final String ERROR_ERROR_UNAUTHORIZED = "UNAUTHORIZED";
