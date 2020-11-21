@@ -1005,7 +1005,7 @@ public class AppointmentController {
 	public ResponseEntity<Object> getAllBreaks(@RequestParam int page, @RequestParam int size) {
 		try {
 			Page<Appointment> days = appointmentRepository.findByServiceAndValidOrderByAppointmentDateToStringDesc(
-					PageRequest.of(page, size), "BREAK BETWEEN APPOINTMENTS", true);
+					PageRequest.of(page, size), "BREAK", true);
 			return new ResponseEntity<Object>(days, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
