@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>ro.patzzcode.appointmentPlatform</groupId>
 	<artifactId>AppointmentPlatform</artifactId>
-	<version>1.1.1-ALPHA</version> 
+	<version>1.2.0</version> 
 	<name>AppointmentPlatform</name>
 	<description>AppointmentPlatformaBackend</description>
 
