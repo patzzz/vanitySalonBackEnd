@@ -52,5 +52,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 	
 	Page<Appointment> findByServiceAndValidOrderByIdDesc(Pageable pageable, String service,
 			boolean valid);
+	
+	Page<Appointment> findByServiceAndValidOrderByAppointmentDateDesc(Pageable pageable, String service,
+			boolean valid);
 
 }

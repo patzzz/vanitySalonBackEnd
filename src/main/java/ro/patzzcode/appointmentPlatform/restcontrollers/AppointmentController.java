@@ -1033,7 +1033,7 @@ public class AppointmentController {
 	@RequestMapping(value = "/api/appointment/getDaysOff", method = RequestMethod.GET)
 	public ResponseEntity<Object> getDaysOff(@RequestParam int page, @RequestParam int size) {
 		try {
-			Page<Appointment> days = appointmentRepository.findByServiceAndValidOrderByIdDesc(
+			Page<Appointment> days = appointmentRepository.findByServiceAndValidOrderByAppointmentDateDesc(
 					PageRequest.of(page, size), "DAY OFF", true);
 			return new ResponseEntity<Object>(days, HttpStatus.OK);
 		} catch (Exception e) {
@@ -1045,7 +1045,7 @@ public class AppointmentController {
 	@RequestMapping(value = "/api/appointment/getAllBreaks", method = RequestMethod.GET)
 	public ResponseEntity<Object> getAllBreaks(@RequestParam int page, @RequestParam int size) {
 		try {
-			Page<Appointment> days = appointmentRepository.findByServiceAndValidOrderByIdDesc(
+			Page<Appointment> days = appointmentRepository.findByServiceAndValidOrderByAppointmentDateDesc(
 					PageRequest.of(page, size), "BREAK", true);
 			return new ResponseEntity<Object>(days, HttpStatus.OK);
 		} catch (Exception e) {
