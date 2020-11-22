@@ -44,7 +44,7 @@ public class AppointmentService {
 		appointment = appointmentRepository.save(appointment);
 
 		if (appointment.getService().equals("DAY OFF")
-				|| appointment.getService().equals("BREAK BETWEEN APPOINTMENTS")) {
+				|| appointment.getService().equals("BREAK")) {
 		} else {
 			Appointment breakAppointment = new Appointment();
 			breakAppointment.setStatus(Constants.APPOINTMENT_STATUS_CONFIRMED);
