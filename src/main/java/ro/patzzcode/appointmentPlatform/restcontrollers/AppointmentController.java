@@ -114,7 +114,7 @@ public class AppointmentController {
 			Date date = new Date();
 			String dateToString = new SimpleDateFormat("yyyy-MM-dd").format(date);
 			Page<Appointment> appointments = appointmentRepository
-					.findByAppointmentDateToStringOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+					.findByAppointmentDateToStringOrderByIdDesc(PageRequest.of(page, size),
 							dateToString);
 			return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 		} catch (Exception e) {
@@ -129,7 +129,7 @@ public class AppointmentController {
 		try {
 //			String dateToString = new SimpleDateFormat("yyyy-MM-dd").format(date);
 			Page<Appointment> appointments = appointmentRepository
-					.findByAppointmentDateToStringAndStatusOrderByAppointmentDateToStringDesc(
+					.findByAppointmentDateToStringAndStatusOrderByIdDesc(
 							PageRequest.of(page, size), date, Constants.APPOINTMENT_STATUS_CONFIRMED);
 			return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 		} catch (Exception e) {
@@ -141,7 +141,7 @@ public class AppointmentController {
 	@RequestMapping(value = "/api/appointment/getAllPendingAppointments", method = RequestMethod.GET)
 	public ResponseEntity<Object> getAllPendingAppointments(@RequestParam int page, @RequestParam int size) {
 		try {
-			Page<Appointment> appointments = appointmentRepository.findByStatusOrderByAppointmentDateToStringDesc(
+			Page<Appointment> appointments = appointmentRepository.findByStatusOrderByIdDesc(
 					PageRequest.of(page, size), Constants.APPOINTMENT_STATUS_PENDING);
 			return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 		} catch (Exception e) {
@@ -153,7 +153,7 @@ public class AppointmentController {
 	@RequestMapping(value = "/api/appointment/getAllConfirmedAppointments", method = RequestMethod.GET)
 	public ResponseEntity<Object> getAllConfirmedAppointments(@RequestParam int page, @RequestParam int size) {
 		try {
-			Page<Appointment> appointments = appointmentRepository.findByStatusOrderByAppointmentDateToStringDesc(
+			Page<Appointment> appointments = appointmentRepository.findByStatusOrderByIdDesc(
 					PageRequest.of(page, size), Constants.APPOINTMENT_STATUS_CONFIRMED);
 			return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 		} catch (Exception e) {
@@ -165,7 +165,7 @@ public class AppointmentController {
 	@RequestMapping(value = "/api/appointment/getAllCancelledAppointments", method = RequestMethod.GET)
 	public ResponseEntity<Object> getAllCancelledAppointments(@RequestParam int page, @RequestParam int size) {
 		try {
-			Page<Appointment> appointments = appointmentRepository.findByStatusOrderByAppointmentDateToStringDesc(
+			Page<Appointment> appointments = appointmentRepository.findByStatusOrderByIdDesc(
 					PageRequest.of(page, size), Constants.APPOINTMENT_STATUS_CANCELED);
 			return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 		} catch (Exception e) {
@@ -177,7 +177,7 @@ public class AppointmentController {
 	@RequestMapping(value = "/api/appointment/getAllCompletedAppointments", method = RequestMethod.GET)
 	public ResponseEntity<Object> getAllCompletedAppointments(@RequestParam int page, @RequestParam int size) {
 		try {
-			Page<Appointment> appointments = appointmentRepository.findByStatusOrderByAppointmentDateToStringDesc(
+			Page<Appointment> appointments = appointmentRepository.findByStatusOrderByIdDesc(
 					PageRequest.of(page, size), Constants.APPOINTMENT_STATUS_COMPLETED);
 			return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 		} catch (Exception e) {
@@ -192,7 +192,7 @@ public class AppointmentController {
 		try {
 //			String dateToString = new SimpleDateFormat("yyyy-MM-dd").format(date);
 			Page<Appointment> appointments = appointmentRepository
-					.findByAppointmentDateToStringAndStatusOrderByAppointmentDateToStringDesc(
+					.findByAppointmentDateToStringAndStatusOrderByIdDesc(
 							PageRequest.of(page, size), date, Constants.APPOINTMENT_STATUS_PENDING);
 			return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 		} catch (Exception e) {
@@ -207,7 +207,7 @@ public class AppointmentController {
 		try {
 			if (date != null) {
 				Page<Appointment> appointments = appointmentRepository
-						.findByAppointmentDateToStringAndStatusOrderByAppointmentDateToStringDesc(
+						.findByAppointmentDateToStringAndStatusOrderByIdDesc(
 								PageRequest.of(page, size), date, Constants.APPOINTMENT_STATUS_CANCELED);
 				return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 			} else {
@@ -225,7 +225,7 @@ public class AppointmentController {
 		try {
 //			String dateToString = new SimpleDateFormat("yyyy-MM-dd").format(date);
 			Page<Appointment> appointments = appointmentRepository
-					.findByAppointmentDateToStringAndStatusOrderByAppointmentDateToStringDesc(
+					.findByAppointmentDateToStringAndStatusOrderByIdDesc(
 							PageRequest.of(page, size), date, Constants.APPOINTMENT_STATUS_COMPLETED);
 			return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 		} catch (Exception e) {
@@ -241,7 +241,7 @@ public class AppointmentController {
 			User user = userRepository.findById(userID).orElse(null);
 			if (user != null) {
 				Page<Appointment> appointments = appointmentRepository
-						.findByClientOrderByAppointmentDateToStringDesc(PageRequest.of(page, size), user);
+						.findByClientOrderByIdDesc(PageRequest.of(page, size), user);
 				return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 			} else {
 				return new ResponseEntity<Object>(
@@ -264,22 +264,22 @@ public class AppointmentController {
 //				if (statusID >= 0 && statusID <= 4) {
 //					if (statusID == 0) {
 //						Page<Appointment> appointments = appointmentRepository
-//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+//								.findByClientAndStatusOrderByIdDesc(PageRequest.of(page, size),
 //										user, Constants.APPOINTMENT_STATUS_PENDING);
 //						return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 //					} else if (statusID == 1) {
 //						Page<Appointment> appointments = appointmentRepository
-//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+//								.findByClientAndStatusOrderByIdDesc(PageRequest.of(page, size),
 //										user, Constants.APPOINTMENT_STATUS_CONFIRMED);
 //						return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 //					} else if (statusID == 2) {
 //						Page<Appointment> appointments = appointmentRepository
-//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+//								.findByClientAndStatusOrderByIdDesc(PageRequest.of(page, size),
 //										user, Constants.APPOINTMENT_STATUS_COMPLETED);
 //						return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 //					} else {
 //						Page<Appointment> appointments = appointmentRepository
-//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+//								.findByClientAndStatusOrderByIdDesc(PageRequest.of(page, size),
 //										user, Constants.APPOINTMENT_STATUS_CANCELED);
 //						return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 //					}
@@ -308,42 +308,42 @@ public class AppointmentController {
 				for (Integer i : statusID) {
 					if (i == 0) {
 						List<Appointment> appointments = appointmentRepository
-								.findByClientAndStatusOrderByAppointmentDateToStringDesc(user,
+								.findByClientAndStatusOrderByIdDesc(user,
 										Constants.APPOINTMENT_STATUS_PENDING);
 						for (Appointment a : appointments) {
 							appointmentsToSend.add(a);
 						}
 //						Page<Appointment> appointments = appointmentRepository
-//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+//								.findByClientAndStatusOrderByIdDesc(PageRequest.of(page, size),
 					} else if (i == 1) {
 						List<Appointment> appointments = appointmentRepository
-								.findByClientAndStatusOrderByAppointmentDateToStringDesc(user,
+								.findByClientAndStatusOrderByIdDesc(user,
 										Constants.APPOINTMENT_STATUS_CONFIRMED);
 						for (Appointment a : appointments) {
 							appointmentsToSend.add(a);
 						}
 //						Page<Appointment> appointments = appointmentRepository
-//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+//								.findByClientAndStatusOrderByIdDesc(PageRequest.of(page, size),
 //										user, Constants.APPOINTMENT_STATUS_CONFIRMED);
 					} else if (i == 2) {
 						List<Appointment> appointments = appointmentRepository
-								.findByClientAndStatusOrderByAppointmentDateToStringDesc(user,
+								.findByClientAndStatusOrderByIdDesc(user,
 										Constants.APPOINTMENT_STATUS_COMPLETED);
 						for (Appointment a : appointments) {
 							appointmentsToSend.add(a);
 						}
 //						Page<Appointment> appointments = appointmentRepository
-//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+//								.findByClientAndStatusOrderByIdDesc(PageRequest.of(page, size),
 //										user, Constants.APPOINTMENT_STATUS_COMPLETED);
 					} else if (i == 3) {
 						List<Appointment> appointments = appointmentRepository
-								.findByClientAndStatusOrderByAppointmentDateToStringDesc(user,
+								.findByClientAndStatusOrderByIdDesc(user,
 										Constants.APPOINTMENT_STATUS_CANCELED);
 						for (Appointment a : appointments) {
 							appointmentsToSend.add(a);
 						}
 //						Page<Appointment> appointments = appointmentRepository
-//								.findByClientAndStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+//								.findByClientAndStatusOrderByIdDesc(PageRequest.of(page, size),
 //										user, Constants.APPOINTMENT_STATUS_CANCELED);
 					}
 				}
@@ -368,22 +368,22 @@ public class AppointmentController {
 			if (statusID == 0 || statusID == 1 || statusID == 2 || statusID == 3) {
 				if (statusID == 0) {
 					Page<Appointment> appointments = appointmentRepository
-							.findByStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+							.findByStatusOrderByIdDesc(PageRequest.of(page, size),
 									Constants.APPOINTMENT_STATUS_PENDING);
 					return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 				} else if (statusID == 1) {
 					Page<Appointment> appointments = appointmentRepository
-							.findByStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+							.findByStatusOrderByIdDesc(PageRequest.of(page, size),
 									Constants.APPOINTMENT_STATUS_CONFIRMED);
 					return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 				} else if (statusID == 2) {
 					Page<Appointment> appointments = appointmentRepository
-							.findByStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+							.findByStatusOrderByIdDesc(PageRequest.of(page, size),
 									Constants.APPOINTMENT_STATUS_COMPLETED);
 					return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 				} else {
 					Page<Appointment> appointments = appointmentRepository
-							.findByStatusOrderByAppointmentDateToStringDesc(PageRequest.of(page, size),
+							.findByStatusOrderByIdDesc(PageRequest.of(page, size),
 									Constants.APPOINTMENT_STATUS_CANCELED);
 					return new ResponseEntity<Object>(appointments, HttpStatus.OK);
 				}
@@ -923,6 +923,47 @@ public class AppointmentController {
 					}
 
 				}
+			} else if (desiredService.equals("feonat")) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 10);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date openTime = cal.getTime();
+
+				cal.setTime(desiredDate);
+				cal.set(Calendar.HOUR_OF_DAY, 18);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+
+				Date closeTime = cal.getTime();
+				List<Appointment> appointments = appointmentRepository
+						.findByAppointmentDateToStringAndValid(desiredDateString, true);
+				Collections.sort(appointments);
+				if (appointments.size() == 0) {
+					free.addAll(getFreeAppointment(openTime, closeTime, Constants.SERVICE_FEONAT));
+				} else {
+					free.addAll(getFreeAppointment(openTime, appointments.get(0).getAppointmentStartTime(),
+							Constants.SERVICE_FEONAT));
+				}
+				for (int i = 0; i < appointments.size(); i++) {
+					Appointment app = appointments.get(i);
+					Appointment nextApp = null;
+					if (i + 1 < appointments.size()) {
+						nextApp = appointments.get(i + 1);
+					}
+					if (nextApp != null) {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), nextApp.getAppointmentStartTime(),
+								Constants.SERVICE_FEONAT));
+					} else {
+						free.addAll(getFreeAppointment(app.getAppointmentEndTime(), closeTime,
+								Constants.SERVICE_FEONAT));
+					}
+
+				}
 			}
 			List<String> intervals = new ArrayList<String>();
 			for (Appointment a : free) {
@@ -992,8 +1033,20 @@ public class AppointmentController {
 	@RequestMapping(value = "/api/appointment/getDaysOff", method = RequestMethod.GET)
 	public ResponseEntity<Object> getDaysOff(@RequestParam int page, @RequestParam int size) {
 		try {
-			Page<Appointment> days = appointmentRepository.findByServiceAndValidOrderByAppointmentDateToStringDesc(
+			Page<Appointment> days = appointmentRepository.findByServiceAndValidOrderByAppointmentDateDesc(
 					PageRequest.of(page, size), "DAY OFF", true);
+			return new ResponseEntity<Object>(days, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@ApiOperation(value = "getAllBreaks")
+	@RequestMapping(value = "/api/appointment/getAllBreaks", method = RequestMethod.GET)
+	public ResponseEntity<Object> getAllBreaks(@RequestParam int page, @RequestParam int size) {
+		try {
+			Page<Appointment> days = appointmentRepository.findByServiceAndValidOrderByAppointmentDateDesc(
+					PageRequest.of(page, size), "BREAK", true);
 			return new ResponseEntity<Object>(days, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);

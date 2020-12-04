@@ -15,10 +15,9 @@ import ro.patzzcode.appointmentPlatform.utils.Constants;
 @Service
 public class AppointmentService {
 
-	
 	@Autowired
 	private AppointmentRepository appointmentRepository;
-	
+
 	@SuppressWarnings("deprecation")
 	public Appointment createAppointment(Appointment appointment, User client) {
 		appointment.setClient(client);
@@ -27,47 +26,49 @@ public class AppointmentService {
 		appointment.setLastUpdate(new Date());
 		appointment.setAppointmentInterval(appointment.getAppointmentInterval());
 		appointment.setAppointmentDate(appointment.getAppointmentDate());
-		String startHour = appointment.getAppointmentInterval().substring(0,2);
-		String startMinute = appointment.getAppointmentInterval().substring(3,5);
-		String endHour = appointment.getAppointmentInterval().substring(8,10);
-		String endMinute = appointment.getAppointmentInterval().substring(11,13);
-		Date startDateTime = new Date(appointment.getAppointmentDate().getYear(), appointment.getAppointmentDate().getMonth(), appointment.getAppointmentDate().getDate(), Integer.parseInt(startHour), Integer.parseInt(startMinute));
-		Date endDateTime = new Date(appointment.getAppointmentDate().getYear(), appointment.getAppointmentDate().getMonth(), appointment.getAppointmentDate().getDate(), Integer.parseInt(endHour), Integer.parseInt(endMinute));
+		String startHour = appointment.getAppointmentInterval().substring(0, 2);
+		String startMinute = appointment.getAppointmentInterval().substring(3, 5);
+		String endHour = appointment.getAppointmentInterval().substring(8, 10);
+		String endMinute = appointment.getAppointmentInterval().substring(11, 13);
+		Date startDateTime = new Date(appointment.getAppointmentDate().getYear(),
+				appointment.getAppointmentDate().getMonth(), appointment.getAppointmentDate().getDate(),
+				Integer.parseInt(startHour), Integer.parseInt(startMinute));
+		Date endDateTime = new Date(appointment.getAppointmentDate().getYear(),
+				appointment.getAppointmentDate().getMonth(), appointment.getAppointmentDate().getDate(),
+				Integer.parseInt(endHour), Integer.parseInt(endMinute));
 		appointment.setAppointmentStartTime(startDateTime);
 		appointment.setAppointmentEndTime(endDateTime);
 		String workaround = new SimpleDateFormat("yyyy-MM-dd").format(appointment.getAppointmentDate());
 		appointment.setAppointmentDateToString(workaround);
 		appointment.setValid(true);
 		appointment = appointmentRepository.save(appointment);
-		
-		Appointment breakAppointment = new Appointment();
-		breakAppointment.setStatus(Constants.APPOINTMENT_STATUS_CONFIRMED);
-		breakAppointment.setCreationDate(new Date());
-		breakAppointment.setLastUpdate(new Date());
-		Date breakEndTime = DateUtils.addMinutes(endDateTime, 15);
-		breakAppointment.setAppointmentStartTime(endDateTime);
-		breakAppointment.setAppointmentEndTime(breakEndTime);
-		breakAppointment.setAppointmentDateToString(workaround);
-		breakAppointment.setValid(true);
-		breakAppointment.setService("DAY OFF");
-		appointmentRepository.save(breakAppointment);
-//		System.out.println("APPOINTMENT DATE: "+appointment.getAppointmentDate());
-//		System.out.println(startHour + ":" + startMinute +" - " + endHour +":"+endMinute);
-//		System.out.println("START TIME: " + startDateTime.getHours() + ":" + startDateTime.getMinutes());
-//		System.out.println("END   TIME: " + endDateTime.getHours() + ":" + endDateTime.getMinutes());
-//		System.out.println("START TIME: " + appointment.getAppointmentStartTime().getHours() + ":" +  appointment.getAppointmentStartTime().getMinutes());
-//		System.out.println("END   TIME: " + appointment.getAppointmentEndTime().getHours() + ":" +  appointment.getAppointmentEndTime().getMinutes());
+
+		if (appointment.getService().equals("DAY OFF")
+				|| appointment.getService().equals("BREAK")) {
+		} else {
+			Appointment breakAppointment = new Appointment();
+			breakAppointment.setStatus(Constants.APPOINTMENT_STATUS_CONFIRMED);
+			breakAppointment.setCreationDate(new Date());
+			breakAppointment.setLastUpdate(new Date());
+			Date breakEndTime = DateUtils.addMinutes(endDateTime, 15);
+			breakAppointment.setAppointmentStartTime(endDateTime);
+			breakAppointment.setAppointmentEndTime(breakEndTime);
+			breakAppointment.setAppointmentDateToString(workaround);
+			breakAppointment.setValid(true);
+			breakAppointment.setService("BREAK BETWEEN APPOINTMENTS");
+			appointmentRepository.save(breakAppointment);
+		}
 		return appointment;
 	}
-	
+
 	public Appointment updateStatus(Appointment appointment, int statusID) {
-		if(statusID == 1) {
+		if (statusID == 1) {
 			appointment.setStatus(Constants.APPOINTMENT_STATUS_CONFIRMED);
 			appointment.setValid(true);
-		}else if(statusID == 2) {
+		} else if (statusID == 2) {
 			appointment.setStatus(Constants.APPOINTMENT_STATUS_COMPLETED);
 			appointment.setValid(true);
-		}else if(statusID == 3) {
+		} else if (statusID == 3) {
 			appointment.setStatus(Constants.APPOINTMENT_STATUS_CANCELED);
 			appointment.setValid(false);
 		}
@@ -75,13 +76,13 @@ public class AppointmentService {
 		appointmentRepository.save(appointment);
 		return appointment;
 	}
-	
+
 	public String returnInterval(Appointment appointment) {
 		String interval = new String();
-		String startHour = appointment.getAppointmentStartTime().toString().substring(11,13);
-		String startMinute = appointment.getAppointmentStartTime().toString().substring(14,16);
-		String endHour = appointment.getAppointmentEndTime().toString().substring(11,13);
-		String endMinute = appointment.getAppointmentEndTime().toString().substring(14,16);
+		String startHour = appointment.getAppointmentStartTime().toString().substring(11, 13);
+		String startMinute = appointment.getAppointmentStartTime().toString().substring(14, 16);
+		String endHour = appointment.getAppointmentEndTime().toString().substring(11, 13);
+		String endMinute = appointment.getAppointmentEndTime().toString().substring(14, 16);
 		interval = startHour + ":" + startMinute + " - " + endHour + ":" + endMinute;
 		return interval;
 	}
