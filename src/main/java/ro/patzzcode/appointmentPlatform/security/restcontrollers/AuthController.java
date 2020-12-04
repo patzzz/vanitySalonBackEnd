@@ -85,7 +85,7 @@ public class AuthController {
 					reuse.setToken(TokenGenerator.generateToken(loginUser.getUsername()));
 					reuse.setLastUpdate(new Date());
 					reuse = repository.save(reuse);
-					if(loginUser.getStatus() == 0 || loginUser.getStatus() == 1) {;
+					if(loginUser.getStatus() == 0) {;
 						return new ResponseEntity<Object>(this.userUnverified,HttpStatus.NOT_ACCEPTABLE);
 					}
 					return new ResponseEntity<Object>(reuse, HttpStatus.OK);
@@ -96,7 +96,7 @@ public class AuthController {
 				t.setLastUpdate(new Date());
 				t.setToken(TokenGenerator.generateToken(loginUser.getUsername()));
 				t = repository.save(t);
-				if(loginUser.getStatus() == 0 || loginUser.getStatus() == 1) {
+				if(loginUser.getStatus() == 0) {
 					return new ResponseEntity<Object>(this.userUnverified,HttpStatus.NOT_ACCEPTABLE);
 				}
 				return new ResponseEntity<Object>(t, HttpStatus.OK);
