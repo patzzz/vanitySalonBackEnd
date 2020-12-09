@@ -86,6 +86,8 @@ public class UserController {
 				} else if (loginUser.getStatus() == 0) {
 					ErrorMessage e = new ErrorMessage();
 					e.setText("USER WAS NOT VERIFIED");
+					e.setUserId(loginUser.getId());
+					e.setUserMail(loginUser.getMail());
 					return new ResponseEntity<Object>(e, HttpStatus.NOT_ACCEPTABLE);
 				} else if (loginUser.getStatus() == 1) {
 					return new ResponseEntity<Object>(loginUser, HttpStatus.OK);
