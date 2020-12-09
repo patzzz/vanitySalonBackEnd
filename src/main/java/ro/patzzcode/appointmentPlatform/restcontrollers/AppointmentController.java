@@ -136,6 +136,33 @@ public class AppointmentController {
 			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@ApiOperation(value = "getAppointmentsOnDate")
+	@RequestMapping(value = "/api/appointment/getAppointmentsOnDate", method = RequestMethod.GET)
+	public ResponseEntity<Object> getAppointmentsOnDate(@RequestParam int page, @RequestParam int size,
+			@RequestParam String date) {
+		try {
+//			String dateToString = new SimpleDateFormat("yyyy-MM-dd").format(date);
+			List<Appointment> confirmedAppointments = appointmentRepository.findByAppointmentDateToStringAndStatusOrderByIdDesc(date, Constants.APPOINTMENT_STATUS_CONFIRMED);
+			List<Appointment> pendingAppointments = appointmentRepository.findByAppointmentDateToStringAndStatusOrderByIdDesc(date, Constants.APPOINTMENT_STATUS_PENDING);
+			List<Appointment> completedAppointments = appointmentRepository.findByAppointmentDateToStringAndStatusOrderByIdDesc(date, Constants.APPOINTMENT_STATUS_COMPLETED);
+			List<Appointment> appointments = new ArrayList<Appointment>();
+			for(Appointment a: confirmedAppointments) {
+				appointments.add(a);
+			}
+			for(Appointment a: pendingAppointments) {
+				appointments.add(a);
+			}
+			for(Appointment a: completedAppointments) {
+				appointments.add(a);
+			}
+			List<Appointment> toSend = Constants.removeDuplicates(appointments);
+			return new ResponseEntity<Object>(toSend, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
 
 	@ApiOperation(value = "getAllPendingAppointments")
 	@RequestMapping(value = "/api/appointment/getAllPendingAppointments", method = RequestMethod.GET)

@@ -1,6 +1,10 @@
 package ro.patzzcode.appointmentPlatform.utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+
+import ro.patzzcode.appointmentPlatform.bo.Appointment;
 
 public class Constants {
 
@@ -28,6 +32,26 @@ public class Constants {
 		}
 		return s.toString();
 	}
+	
+	public static List<Appointment> removeDuplicates(List<Appointment> appointments) 
+    { 
+        // Create a new ArrayList 
+        List<Appointment> newList = new ArrayList<Appointment>();
+
+        // Traverse through the first list 
+        for (Appointment element : appointments) { 
+
+            // If this element is not present in newList 
+            // then add it 
+            if (!newList.contains(element)) { 
+
+                newList.add(element); 
+            } 
+        } 
+
+        // return the new list 
+        return newList; 
+    }
 	
 	public static final int SERVICE_TUNS_BARBAT = 30;
 	public static final int SERVICE_TUNS_FEMEIE = 90;
