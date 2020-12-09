@@ -146,6 +146,7 @@ public class AppointmentController {
 			List<Appointment> confirmedAppointments = appointmentRepository.findByAppointmentDateToStringAndStatusOrderByIdDesc(date, Constants.APPOINTMENT_STATUS_CONFIRMED);
 			List<Appointment> pendingAppointments = appointmentRepository.findByAppointmentDateToStringAndStatusOrderByIdDesc(date, Constants.APPOINTMENT_STATUS_PENDING);
 			List<Appointment> completedAppointments = appointmentRepository.findByAppointmentDateToStringAndStatusOrderByIdDesc(date, Constants.APPOINTMENT_STATUS_COMPLETED);
+			List<Appointment> confirmedAppointments = appointmentRepository.findByAppointmentDateToStringAndStatusOrderByIdDesc(date, Constants.APPOINTMENT_STATUS_CONFIRMED);
 			List<Appointment> appointments = new ArrayList<Appointment>();
 			for(Appointment a: confirmedAppointments) {
 				appointments.add(a);
@@ -154,6 +155,9 @@ public class AppointmentController {
 				appointments.add(a);
 			}
 			for(Appointment a: completedAppointments) {
+				appointments.add(a);
+			}
+			for(Appointment a: confirmedAppointments) {
 				appointments.add(a);
 			}
 			List<Appointment> toSend = Constants.removeDuplicates(appointments);
